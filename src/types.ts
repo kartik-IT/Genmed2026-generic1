@@ -1,5 +1,27 @@
 export type NavTab = 'search' | 'compare' | 'pharmacies' | 'saved-rx';
 
+export type ThemeMode =
+  | 'clinical-teal'
+  | 'midnight-dark'
+  | 'nordic-emerald'
+  | 'sapphire-health'
+  | 'amethyst-care'
+  | 'warm-amber'
+  | 'rose-care'
+  | 'obsidian-emerald';
+
+export interface ThemeOption {
+  id: ThemeMode;
+  name: string;
+  subtitle: string;
+  isDark: boolean;
+  accentHex: string;
+  surfaceHex: string;
+  secondaryHex: string;
+  badgeTag: string;
+  tagline: string;
+}
+
 export interface Pharmacy {
   id: string;
   name: string;

@@ -75,11 +75,325 @@
 }
 
 @layer base {
+  :root,
+  [data-theme="clinical-teal"] {
+    --color-surface: #f8fbfb;
+    --color-surface-dim: #d8eded;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f0fdf9;
+    --color-surface-container: #e6f7f5;
+    --color-surface-container-high: #d2f0eb;
+    --color-surface-container-highest: #bfe9e2;
+    --color-on-surface: #0a2321;
+    --color-on-surface-variant: #3a5350;
+    --color-inverse-surface: #132a28;
+    --color-inverse-on-surface: #f0fdfa;
+    --color-outline: #6b8884;
+    --color-outline-variant: #bcd2cf;
+    --color-surface-tint: #006a61;
+    --color-primary: #0a2321;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #103834;
+    --color-on-primary-container: #8cf2e5;
+    --color-inverse-primary: #80ded2;
+    --color-secondary: #006a61;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #86f2e4;
+    --color-on-secondary-container: #004d46;
+    --color-tertiary: #064e3b;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #a7f3d0;
+    --color-on-tertiary-container: #022c22;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #f8fbfb;
+    --color-on-background: #0a2321;
+    --color-surface-variant: #d2f0eb;
+  }
+
+  /* Midnight Dark Mode - Sleek OLED nocturnal mode */
+  [data-theme="midnight-dark"],
+  .dark {
+    --color-surface: #090e17;
+    --color-surface-dim: #05080e;
+    --color-surface-bright: #141c2d;
+    --color-surface-container-lowest: #0f1726;
+    --color-surface-container-low: #152035;
+    --color-surface-container: #1b2842;
+    --color-surface-container-high: #243557;
+    --color-surface-container-highest: #2e446d;
+    --color-on-surface: #f1f5f9;
+    --color-on-surface-variant: #94a3b8;
+    --color-inverse-surface: #f1f5f9;
+    --color-inverse-on-surface: #0f172a;
+    --color-outline: #475569;
+    --color-outline-variant: #334155;
+    --color-surface-tint: #2dd4bf;
+    --color-primary: #38bdf8;
+    --color-on-primary: #032030;
+    --color-primary-container: #0c4a6e;
+    --color-on-primary-container: #bae6fd;
+    --color-inverse-primary: #0284c7;
+    --color-secondary: #14b8a6;
+    --color-on-secondary: #022c26;
+    --color-secondary-container: #115e59;
+    --color-on-secondary-container: #ccfbf1;
+    --color-tertiary: #38bdf8;
+    --color-on-tertiary: #082f49;
+    --color-tertiary-container: #0369a1;
+    --color-on-tertiary-container: #e0f2fe;
+    --color-error: #f87171;
+    --color-on-error: #450a0a;
+    --color-error-container: #7f1d1d;
+    --color-on-error-container: #fecaca;
+    --color-background: #090e17;
+    --color-on-background: #f1f5f9;
+    --color-surface-variant: #1e293b;
+  }
+
+  /* Nordic Emerald - Serene Botanical Herbal Green */
+  [data-theme="nordic-emerald"] {
+    --color-surface: #f4f8f4;
+    --color-surface-dim: #d5e5d5;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #e9f3e9;
+    --color-surface-container: #d9ebd9;
+    --color-surface-container-high: #c7dec7;
+    --color-surface-container-highest: #b4d1b4;
+    --color-on-surface: #0d2613;
+    --color-on-surface-variant: #315137;
+    --color-inverse-surface: #14351a;
+    --color-inverse-on-surface: #e9f5e9;
+    --color-outline: #5c7e63;
+    --color-outline-variant: #acc7b1;
+    --color-surface-tint: #166534;
+    --color-primary: #14532d;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #166534;
+    --color-on-primary-container: #bbf7d0;
+    --color-inverse-primary: #86efac;
+    --color-secondary: #15803d;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #bbf7d0;
+    --color-on-secondary-container: #14532d;
+    --color-tertiary: #047857;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #a7f3d0;
+    --color-on-tertiary-container: #064e3b;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #f4f8f4;
+    --color-on-background: #0d2613;
+    --color-surface-variant: #c7dec7;
+  }
+
+  /* Sapphire Health - Digital Royal Blue Healthcare */
+  [data-theme="sapphire-health"] {
+    --color-surface: #f4f8ff;
+    --color-surface-dim: #d0e1fd;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #e8f1ff;
+    --color-surface-container: #d8e6ff;
+    --color-surface-container-high: #c3d9ff;
+    --color-surface-container-highest: #adccff;
+    --color-on-surface: #071e3d;
+    --color-on-surface-variant: #334e73;
+    --color-inverse-surface: #112d53;
+    --color-inverse-on-surface: #edf3ff;
+    --color-outline: #5e7a9e;
+    --color-outline-variant: #b0c6e4;
+    --color-surface-tint: #0284c7;
+    --color-primary: #034694;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #0b3368;
+    --color-on-primary-container: #bad7ff;
+    --color-inverse-primary: #9ec5fe;
+    --color-secondary: #0284c7;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #bae6fd;
+    --color-on-secondary-container: #0369a1;
+    --color-tertiary: #0284c7;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #bae6fd;
+    --color-on-tertiary-container: #075985;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #f4f8ff;
+    --color-on-background: #071e3d;
+    --color-surface-variant: #c3d9ff;
+  }
+
+  /* Amethyst Care - Modern Wellness & Therapy Violet */
+  [data-theme="amethyst-care"] {
+    --color-surface: #faf6ff;
+    --color-surface-dim: #e1d2fa;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f3ebff;
+    --color-surface-container: #e9daff;
+    --color-surface-container-high: #ddc5ff;
+    --color-surface-container-highest: #d1b0ff;
+    --color-on-surface: #1f083b;
+    --color-on-surface-variant: #4f3b6a;
+    --color-inverse-surface: #2b134d;
+    --color-inverse-on-surface: #f8f1ff;
+    --color-outline: #776394;
+    --color-outline-variant: #c5b5dc;
+    --color-surface-tint: #7c3aed;
+    --color-primary: #4c1d95;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #331267;
+    --color-on-primary-container: #e3d2ff;
+    --color-inverse-primary: #c4b5fd;
+    --color-secondary: #7c3aed;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #ddd6fe;
+    --color-on-secondary-container: #5b21b6;
+    --color-tertiary: #6d28d9;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #ede9fe;
+    --color-on-tertiary-container: #4c1d95;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #faf6ff;
+    --color-on-background: #1f083b;
+    --color-surface-variant: #ddc5ff;
+  }
+
+  /* Warm Amber & Terracotta - Soothing Humane Comfort */
+  [data-theme="warm-amber"] {
+    --color-surface: #fffdf7;
+    --color-surface-dim: #faeccf;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #fef7e6;
+    --color-surface-container: #fdedcf;
+    --color-surface-container-high: #fce0b0;
+    --color-surface-container-highest: #fad391;
+    --color-on-surface: #361f03;
+    --color-on-surface-variant: #614624;
+    --color-inverse-surface: #452c0c;
+    --color-inverse-on-surface: #fff8eb;
+    --color-outline: #8c714c;
+    --color-outline-variant: #dbcaa8;
+    --color-surface-tint: #d97706;
+    --color-primary: #78350f;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #522307;
+    --color-on-primary-container: #fed7aa;
+    --color-inverse-primary: #fdba74;
+    --color-secondary: #d97706;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #fde68a;
+    --color-on-secondary-container: #92400e;
+    --color-tertiary: #b45309;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #fef3c7;
+    --color-on-tertiary-container: #78350f;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #fffdf7;
+    --color-on-background: #361f03;
+    --color-surface-variant: #fce0b0;
+  }
+
+  /* Rose Care - Empathetic Compassion Pink */
+  [data-theme="rose-care"] {
+    --color-surface: #fff7f8;
+    --color-surface-dim: #fad0d8;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #feeff2;
+    --color-surface-container: #fde0e6;
+    --color-surface-container-high: #fcced7;
+    --color-surface-container-highest: #fbbac7;
+    --color-on-surface: #380714;
+    --color-on-surface-variant: #6b2837;
+    --color-inverse-surface: #48111f;
+    --color-inverse-on-surface: #fff0f3;
+    --color-outline: #945362;
+    --color-outline-variant: #dfb1bc;
+    --color-surface-tint: #e11d48;
+    --color-primary: #881337;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #55071e;
+    --color-on-primary-container: #fecdd3;
+    --color-inverse-primary: #fda4af;
+    --color-secondary: #e11d48;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #ffe4e6;
+    --color-on-secondary-container: #9f1239;
+    --color-tertiary: #be123c;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #ffe4e6;
+    --color-on-tertiary-container: #881337;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #fff7f8;
+    --color-on-background: #380714;
+    --color-surface-variant: #fcced7;
+  }
+
+  /* Obsidian Emerald - High-contrast surgical dark */
+  [data-theme="obsidian-emerald"] {
+    --color-surface: #07120e;
+    --color-surface-dim: #030a07;
+    --color-surface-bright: #10231c;
+    --color-surface-container-lowest: #0c1c16;
+    --color-surface-container-low: #12271f;
+    --color-surface-container: #19352a;
+    --color-surface-container-high: #224538;
+    --color-surface-container-highest: #2d5848;
+    --color-on-surface: #f0fdf4;
+    --color-on-surface-variant: #86efac;
+    --color-inverse-surface: #f0fdf4;
+    --color-inverse-on-surface: #07120e;
+    --color-outline: #388463;
+    --color-outline-variant: #1b4d37;
+    --color-surface-tint: #34d399;
+    --color-primary: #10b981;
+    --color-on-primary: #022c22;
+    --color-primary-container: #064e3b;
+    --color-on-primary-container: #a7f3d0;
+    --color-inverse-primary: #059669;
+    --color-secondary: #34d399;
+    --color-on-secondary: #022c22;
+    --color-secondary-container: #065f46;
+    --color-on-secondary-container: #d1fae5;
+    --color-tertiary: #6ee7b7;
+    --color-on-tertiary: #022c22;
+    --color-tertiary-container: #047857;
+    --color-on-tertiary-container: #ecfdf5;
+    --color-error: #f87171;
+    --color-on-error: #450a0a;
+    --color-error-container: #7f1d1d;
+    --color-on-error-container: #fecaca;
+    --color-background: #07120e;
+    --color-on-background: #f0fdf4;
+    --color-surface-variant: #1b3528;
+  }
+
   body {
-    background-color: var(--color-surface, #f8f9ff);
-    color: var(--color-on-surface, #0b1c30);
+    background-color: var(--color-surface, #f8fbfb);
+    color: var(--color-on-surface, #0a2321);
     font-family: 'Inter', sans-serif;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 

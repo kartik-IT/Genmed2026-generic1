@@ -37,6 +37,9 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
   const [voiceSearchActive, setVoiceSearchActive] = useState(false);
   const [supplyDays, setSupplyDays] = useState<'30' | '90'>('30');
   const [selectedStrength, setSelectedStrength] = useState(drug.strength);
+  const [savingsTimeframe, setSavingsTimeframe] = useState<'month' | 'year' | '3years'>('year');
+  const [isFamilyPlan, setIsFamilyPlan] = useState(false);
+  const [isEquivalenceExpanded, setIsEquivalenceExpanded] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -802,7 +805,246 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
         </div>
       </section>
 
-      {/* Clinical Monograph Collapsible Drawer */}
+      {/* Real-Life Household Impact Calculator */}
+      <section className="px-3 pb-2">
+        <div className="bg-surface-container-lowest rounded-xl shadow-xs border border-surface-container p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center">
+                <span className="material-symbols-outlined text-[18px]">calculate</span>
+              </span>
+              <div>
+                <h4 className="font-headline-sm text-[15px] font-bold text-on-surface leading-tight">
+                  Real-World Value Translation
+                </h4>
+                <p className="font-label-sm text-[11px] text-on-surface-variant">
+                  What switching to generic {drug.genericName} means for your household
+                </p>
+              </div>
+            </div>
+
+            {/* Family Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsFamilyPlan(!isFamilyPlan)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors flex items-center gap-1 ${
+                isFamilyPlan
+                  ? 'bg-secondary text-on-secondary border-secondary'
+                  : 'bg-surface-container text-on-surface-variant border-surface-container-high hover:text-on-surface'
+              }`}
+              title="Toggle Household (2 People) Savings"
+            >
+              <span className="material-symbols-outlined text-[14px]">group</span>
+              <span>{isFamilyPlan ? '2 People' : '1 Person'}</span>
+            </button>
+          </div>
+
+          {/* Timeframe Selector Chips */}
+          <div className="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-lg border border-surface-container/60">
+            <button
+              type="button"
+              onClick={() => setSavingsTimeframe('month')}
+              className={`flex-1 py-1.5 rounded-md text-[12px] font-bold transition-all ${
+                savingsTimeframe === 'month'
+                  ? 'bg-surface-container-lowest text-secondary shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              1 Month
+            </button>
+            <button
+              type="button"
+              onClick={() => setSavingsTimeframe('year')}
+              className={`flex-1 py-1.5 rounded-md text-[12px] font-bold transition-all ${
+                savingsTimeframe === 'year'
+                  ? 'bg-surface-container-lowest text-secondary shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              1 Year (Annual)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSavingsTimeframe('3years')}
+              className={`flex-1 py-1.5 rounded-md text-[12px] font-bold transition-all ${
+                savingsTimeframe === '3years'
+                  ? 'bg-surface-container-lowest text-secondary shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              3 Years
+            </button>
+          </div>
+
+          {/* Highlighted Net Retained Dollars */}
+          {(() => {
+            const periodMonths = savingsTimeframe === 'month' ? 1 : savingsTimeframe === 'year' ? 12 : 36;
+            const multiplierPeople = isFamilyPlan ? 2 : 1;
+            const totalRetained = currentSavings * periodMonths * multiplierPeople;
+            const weeksGroceries = Math.max(1, Math.round(totalRetained / 115));
+            const monthsUtilities = (totalRetained / 170).toFixed(1);
+            const preventativeVisits = Math.max(1, Math.round(totalRetained / 160));
+
+            return (
+              <div className="flex flex-col gap-2.5">
+                <div className="p-3 rounded-xl bg-gradient-to-r from-secondary-container/30 to-surface-container-high/40 border border-secondary/20 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="font-label-sm text-[11px] font-semibold text-secondary uppercase tracking-wider block">
+                      Guaranteed Net Retained Capital
+                    </span>
+                    <span className="font-headline-lg text-[24px] font-black text-on-surface">
+                      ${totalRetained.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-[11px] font-extrabold flex items-center gap-1 shadow-xs">
+                    <span className="material-symbols-outlined text-[13px]">verified</span>
+                    {drug.instantNetSavePercent}% Saved
+                  </span>
+                </div>
+
+                {/* 3 Meaningful Real-World Equivalents */}
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col items-center gap-1">
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      shopping_cart
+                    </span>
+                    <span className="font-headline-sm text-[14px] font-black text-on-surface leading-tight">
+                      ~{weeksGroceries} Wks
+                    </span>
+                    <span className="font-label-sm text-[10px] text-on-surface-variant">
+                      Fresh Produce &amp; Food
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col items-center gap-1">
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      bolt
+                    </span>
+                    <span className="font-headline-sm text-[14px] font-black text-on-surface leading-tight">
+                      {monthsUtilities} Mos
+                    </span>
+                    <span className="font-label-sm text-[10px] text-on-surface-variant">
+                      Home Electric &amp; Water
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col items-center gap-1">
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      health_and_safety
+                    </span>
+                    <span className="font-headline-sm text-[14px] font-black text-on-surface leading-tight">
+                      {preventativeVisits} Visits
+                    </span>
+                    <span className="font-label-sm text-[10px] text-on-surface-variant">
+                      Dental &amp; Vision Care
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* Meaningful FDA Bioequivalence Science & Truth */}
+      <section className="px-3 pb-2">
+        <div className="bg-surface-container-lowest rounded-xl shadow-xs border border-surface-container p-4 flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
+                <span className="material-symbols-outlined text-[18px]">verified_user</span>
+              </span>
+              <div>
+                <h4 className="font-headline-sm text-[15px] font-bold text-on-surface leading-tight">
+                  The Science Behind Generic Equality
+                </h4>
+                <p className="font-label-sm text-[11px] text-on-surface-variant">
+                  Why a $9.20 generic provides 100% of the clinical outcome of a $142.80 brand
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEquivalenceExpanded(!isEquivalenceExpanded)}
+              className="text-secondary font-label-sm text-[11px] font-bold hover:underline flex-shrink-0"
+            >
+              {isEquivalenceExpanded ? 'Show Less' : 'Learn Why'}
+            </button>
+          </div>
+
+          {/* 3 Pillars of Generic Equivalence */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col gap-1">
+              <div className="flex items-center gap-1 text-secondary">
+                <span className="material-symbols-outlined text-[16px]">biotech</span>
+                <span className="font-label-sm text-[11px] font-extrabold uppercase">Exact Molecule</span>
+              </div>
+              <p className="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+                Contains identical active pharmaceutical ingredient (API) in the exact same strength ({drug.strength}).
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col gap-1">
+              <div className="flex items-center gap-1 text-secondary">
+                <span className="material-symbols-outlined text-[16px]">insights</span>
+                <span className="font-label-sm text-[11px] font-extrabold uppercase">99.4% Bio-AUC</span>
+              </div>
+              <p className="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+                Absorbs at the identical rate and delivers equal blood plasma concentration as the original brand.
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col gap-1">
+              <div className="flex items-center gap-1 text-secondary">
+                <span className="material-symbols-outlined text-[16px]">savings</span>
+                <span className="font-label-sm text-[11px] font-extrabold uppercase">Zero Marketing Markups</span>
+              </div>
+              <p className="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+                No $2B advertising campaigns or expired patent monopolies. Only pure, safe medication.
+              </p>
+            </div>
+          </div>
+
+          {/* Expandable Deep Science Details */}
+          {isEquivalenceExpanded && (
+            <div className="p-3 rounded-lg bg-surface-container-low border border-surface-container flex flex-col gap-2 animate-fadeIn text-[12px] text-on-surface-variant leading-relaxed">
+              <div className="flex items-center gap-1.5 text-on-surface font-bold">
+                <span className="material-symbols-outlined text-secondary text-[16px]">verified</span>
+                <span>FDA Orange Book &quot;AB&quot; Therapeutic Rating Standard</span>
+              </div>
+              <p>
+                Under FDA Code of Federal Regulations Title 21, generic products marked &quot;AB&quot; have demonstrated bioequivalence in controlled human in-vivo pharmacokinetic trials. Neither your physician nor pharmacist needs to alter the therapeutic dosing when transitioning to AB-rated generic {drug.genericName}.
+              </p>
+              <div className="flex items-center justify-between pt-1 border-t border-surface-container text-[11px] text-secondary font-semibold">
+                <span>Verified Reference Drug: {drug.brandName}</span>
+                <span>NDC: {drug.ndc}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Cash vs Insurance Copay Clarity Card */}
+      <section className="px-3 pb-2">
+        <div className="p-3 rounded-xl bg-surface-container-low border border-surface-container flex items-start gap-3">
+          <span className="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="material-symbols-outlined text-[18px]">credit_card_off</span>
+          </span>
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-headline-sm text-[13px] font-bold text-on-surface">
+                Did You Know? Cash Is Often Cheaper Than Copays
+              </span>
+              <span className="font-label-sm text-[10px] px-1.5 py-0.2 rounded bg-secondary text-on-secondary font-bold">
+                PRO-TIP
+              </span>
+            </div>
+            <p className="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+              Standard commercial insurance often imposes fixed copays of $20.00–$40.00 or requires meeting high annual deductibles. Low &amp; Best&apos;s direct cash adjudication rate is fixed at <strong>${currentGenericRate.toFixed(2)}</strong> with zero deductible hurdles or pre-authorization delays.
+            </p>
+          </div>
+        </div>
+      </section>
       <section className="px-3 pb-6">
         <div className="bg-surface-container-lowest rounded-xl shadow-xs border border-surface-container overflow-hidden">
           <button
