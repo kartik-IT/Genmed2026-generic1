@@ -1,0 +1,6 @@
+{
+  "name": "Low & Best Medicine Generics",
+  "description": "Cost-aware bioequivalent medicine discovery, clinical comparison, pharmacy stock verification, and digital savings pass platform.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
