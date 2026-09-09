@@ -13,6 +13,8 @@ import regimensRouter from './server/routes/regimens';
 import pricingRouter from './server/routes/pricing';
 import aiRouter from './server/routes/ai';
 import authRouter from './server/routes/auth';
+import pushRouter from './server/routes/push';
+import errorsRouter from './server/routes/errors';
 
 const app = express();
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -97,6 +99,8 @@ app.use('/api/regimens', generalLimiter, dataCache, regimensRouter);
 app.use('/api/pricing', generalLimiter, pricingCache, pricingRouter);
 app.use('/api/ai', aiLimiter, aiRouter);
 app.use('/api/auth', generalLimiter, authRouter);
+app.use('/api/push', generalLimiter, pushRouter);
+app.use('/api/errors', generalLimiter, errorsRouter);
 
 // Health check (no rate limit or cache)
 app.get('/api/health', (_req, res) => {

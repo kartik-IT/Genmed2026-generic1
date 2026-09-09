@@ -13,101 +13,150 @@
 | **Stack**           | React 19 · Vite 6 · TypeScript · TailwindCSS v4 · Motion · Express |
 | **AI Integration**  | Google Gemini via `@google/genai` (server-side)                    |
 | **License**         | Apache-2.0                                                        |
-| **Dev Server Port** | 3000                                                               |
+| **Dev Server Port** | 3000 (Vite) / 3001 (Express API)                                  |
 
 ---
 
-## Current State (as of 2026-09-08)
+## Current State (as of 2026-09-09)
 
 ### What's Built ✅
-- **Search Screen** — Drug search with profile cards, instant savings display, top-pharmacy preview, and quick actions (voucher, hold-lock, pill visualizer).
-- **Compare Screen** — Side-by-side bioequivalent generic comparison with detailed pharmacokinetics data (AUC, bioavailability, excipients).
-- **Pharmacies Screen** — Nearby pharmacy listing with stock status, pricing, ratings, bio-match percentage, and drive-thru availability.
+- **Search Screen** — Drug search with AI-powered backend, profile cards, savings display, top-pharmacy preview, and quick actions.
+- **Compare Screen** — Side-by-side bioequivalent generic comparison with pharmacokinetics data.
+- **Pharmacies Screen** — Nearby pharmacy listing with stock status, pricing, ratings, bio-match %, and drive-thru availability.
 - **Saved Rx Screen** — Tracked regimen management with refill tracking, price-drop alerts, and blockchain-style fill ledger.
-- **Barcode Scanner Modal** — Camera-based drug barcode scanning with automatic profile matching.
-- **Voucher Modal** — Digital savings pass generation for pharmacy checkout.
-- **Hold & Lock Modal** — 4-hour price-lock reservation with PIN confirmation.
-- **Pill Visualizer Modal** — Visual pill identification tool.
-- **Rx Transfer Modal** — Prescription transfer workflow.
-- **Location Modal** — Geolocation-based pharmacy search radius adjustment.
-- **Notifications Drawer** — Price alerts, refill reminders, and stock notifications.
-- **Savings History Modal** — Historical savings tracking per regimen.
-- **Toast System** — Dynamic success/info/warning notifications (max 3 concurrent).
+- **All Modals** — Barcode Scanner, Voucher, Hold & Lock, Pill Visualizer, Rx Transfer, Location, Notifications Drawer, Savings History, Theme Studio — all with ARIA roles and focus traps.
+- **Authentication** — OIDC 2.0 with PKCE, server-side session management, sign-in/sign-out UI in Header with user avatar.
+- **PWA** — Service worker v2 (app-shell + stale-while-revalidate), Web App Manifest, IndexedDB offline-first cache, push notification subscription, app install prompt.
+- **Offline-first data** — `src/lib/db.ts` (IndexedDB), `src/lib/offlineCache.ts` (stale-while-revalidate helpers for all data types).
+- **Push Notifications** — Backend (`/api/push/*`), client hook (`usePushNotifications`), opt-in UI in NotificationsDrawer, service worker push handler.
+- **Background Sync stubs** — `hold-lock-sync` and `voucher-save-sync` tags in service worker (replay logic to be implemented).
+- **Accessibility** — Focus traps (`useFocusTrap`), skip link, ARIA dialogs, `aria-live` regions, semantic HTML, `prefers-color-scheme`, `prefers-reduced-motion`, `focus-visible` ring, `sr-only` utility.
+- **Error Reporting** — `captureGlobalErrors()` in `main.tsx`, `reportError()` helper, `/api/errors` ingestion route, ErrorBoundary integration.
+- **CI/CD** — GitHub Actions: `ci.yml` (lint → test → build → docker), `deploy.yml` (manual staging/production trigger).
+- **Theme System** — 8 themes with persistent localStorage, dark/light toggle, `prefers-color-scheme` OS fallback.
 
 ### What's Pending ⏳
-- [ ] Real API integration (replacing `mockData.ts`)
-- [ ] Gemini AI-powered drug search and recommendations
-- [ ] Express backend server implementation
-- [ ] User authentication and session management
-- [ ] Real pharmacy stock verification API
-- [ ] Real-time pricing data feeds
-- [ ] Persistent user data (saved prescriptions, preferences)
-- [ ] PWA configuration for offline-capable mobile experience
-- [ ] Accessibility audit and ARIA improvements
-- [ ] Unit and integration test coverage
+- [ ] Database persistence for sessions, regimens, and user preferences
+- [ ] HIPAA compliance review and BAA with identity/data provider
+- [ ] Web-push server dispatch (requires `web-push` npm package + VAPID keys configured)
+- [ ] IndexedDB background sync queue for hold-lock requests
+- [ ] Component and E2E test suite
+- [ ] Accessibility audit (axe-core, screen reader, contrast ratios)
+- [ ] APM integration (wire `/api/errors` to Sentry/Datadog)
+- [ ] Real pricing and pharmacy-stock data provider contracts
 
 ---
 
 ## Key Technical Notes
 
 ### App Architecture
-- `App.tsx` is the central orchestrator — all global state (active tab, selected drug, selected pharmacy, modal visibility) lives here.
+- `App.tsx` is the central orchestrator — global state lives here.
 - Screens are "dumb" — they receive data and emit events via callback props.
-- Navigation is state-driven (no React Router), using `NavTab` union type: `'search' | 'compare' | 'pharmacies' | 'saved-rx'`.
+- Navigation is state-driven via `NavTab` union type: `'search' | 'compare' | 'pharmacies' | 'saved-rx'`.
 
 ### Data Flow
 ```
-mockData.ts → App.tsx (state) → Screen Components (props) → Modal Components (props)
-                  ↑                        |
-                  └────── callbacks ────────┘
+IndexedDB (offline cache) ←→ API layer (src/api/*) → useApi hook → App.tsx (state) → Screens / Modals
+                                    ↑
+                           offlineCache.ts (stale-while-revalidate)
+                                    ↑
+                               /api/* (Express)
 ```
 
+### Offline Strategy
+1. First load: fetch from network, persist to IndexedDB.
+2. Subsequent loads within 10 min: serve IndexedDB immediately; background-refresh if age > 5 min.
+3. Network unavailable: serve IndexedDB; surface `Error` if no cache exists.
+
+### Push Notifications
+- Server: `server/routes/push.ts` manages subscriptions (in-memory; replace with DB for production).
+- Client: `usePushNotifications` hook handles permission, subscribe/unsubscribe.
+- Service worker: handles `push` events and displays native notifications.
+- VAPID keys must be generated and set in env before this works end-to-end.
+
+### Auth Flow
+- `/api/auth/login` → OIDC provider → `/api/auth/callback` → session cookie → `/api/auth/me`.
+- App.tsx calls `fetchCurrentUser()` on mount when `authStatus.configured === true`.
+- Header shows user avatar/initials when signed in; sign-in button (disabled when unconfigured) otherwise.
+
+### Error Reporting
+- `captureGlobalErrors()` (called in `main.tsx`) installs `window.onerror` and `unhandledrejection` handlers.
+- `reportError(error, { context, extra })` posts to `/api/errors` (fire-and-forget).
+- `ErrorBoundary.componentDidCatch` calls `reportError` automatically.
+- `/api/errors` logs server-side; wire to Sentry/Datadog when ready.
+
+### CI/CD
+- `ci.yml`: runs on every push/PR — type-check, tests, production build, docker build.
+- `deploy.yml`: manually triggered workflow — targets staging or production environment.
+- Docker push and Cloud Run deploy steps exist but are commented out pending registry config.
+
 ### Important Interfaces
-- `DrugProfile` — Core drug entity with nested `alternatives: GenericAlternative[]` and `pharmacies: Pharmacy[]`.
-- `Pharmacy` — Includes pricing, stock, geo-coordinates, bio-match %, and verification timestamps.
-- `GenericAlternative` — Bioequivalence data including AUC, manufacturer, rating code, and savings calculations.
-- `TrackedRegimen` — User's saved prescription with refill tracking and price alerts.
-- `FillLedgerItem` — Immutable fill record with hash (blockchain-style integrity).
+- `DrugProfile` — Core drug entity with nested `alternatives` and `pharmacies`.
+- `Pharmacy` — Pricing, stock, geo, bio-match %, verification timestamps.
+- `GenericAlternative` — Bioequivalence data, AUC, manufacturer, savings.
+- `TrackedRegimen` — User's saved prescription with refill tracking.
+- `FillLedgerItem` — Immutable fill record with hash.
 
 ### Environment Variables
-- `GEMINI_API_KEY` — Required for AI features, injected by AI Studio at runtime.
-- `APP_URL` — Self-referential URL for callbacks and API endpoints.
-- `DISABLE_HMR` — Set to `"true"` in AI Studio to prevent flickering during agent edits.
+| Variable | Required | Purpose |
+|---|---|---|
+| `GEMINI_API_KEY` | For AI features | Gemini AI search and recommendations |
+| `OPENFDA_API_KEY` | Optional | Higher openFDA rate limits |
+| `OIDC_ISSUER` | For auth | OpenID Connect provider URL |
+| `OIDC_CLIENT_ID` | For auth | OIDC client ID |
+| `OIDC_CLIENT_SECRET` | For auth | OIDC client secret |
+| `OIDC_REDIRECT_URI` | For auth | Auth callback URL |
+| `VAPID_PUBLIC_KEY` | For push | Web Push VAPID public key |
+| `VAPID_PRIVATE_KEY` | For push | Web Push VAPID private key |
+| `PHARMACY_STOCK_PROVIDER_URL` | For live stock | Partner inventory API base URL |
+| `PHARMACY_STOCK_PROVIDER_KEY` | For live stock | Partner inventory API key |
+| `PRICING_PROVIDER_URL` | For live prices | Partner pricing API base URL |
+| `PRICING_PROVIDER_KEY` | For live prices | Partner pricing API key |
+| `APP_URL` | Production | Self-referential URL |
+| `PORT` | Optional | Express port (default: 3001) |
 
 ---
 
 ## Known Issues & Gotchas
 
-1. **Toast queue slicing** — `prev.slice(-2)` in `showToast` limits to 3 toasts but may drop important messages under rapid-fire scenarios. Consider a priority queue if this becomes an issue.
-2. **No deep linking** — Tab-based navigation without React Router means users can't bookmark or share specific views.
-3. **Mock data coupling** — Components reference specific mock data IDs/names for pharmacy matching (e.g., `p.name.includes(regimen.pharmacyName)`). This string-matching pattern is fragile and must be replaced with proper ID-based lookups.
-4. **HMR toggle** — The `DISABLE_HMR` / file-watching toggle in `vite.config.ts` is AI Studio-specific. Don't modify this without understanding the deployment context.
-5. **Camera permission** — `requestFramePermissions: ["camera"]` in `metadata.json` is an AI Studio-specific declaration, not a standard web API permission request.
-
----
-
-## Lessons Learned
-
-- **TailwindCSS v4 + Vite plugin** — Zero-config setup via `@tailwindcss/vite` works seamlessly. No need for `postcss.config.js` or `tailwind.config.js`.
-- **Motion library** — The successor to Framer Motion integrates well with React 19's rendering model.
-- **Centralized modal state** — Works cleanly up to ~7 modals. Beyond that, consider a modal manager pattern or React Context.
-- **TypeScript strict mode** — Catching type mismatches early prevented several bugs in the pharmacy/drug matching logic.
+1. **Toast queue slicing** — `prev.slice(-2)` limits to 3 toasts; may drop messages under rapid-fire. Consider priority queue if needed.
+2. **No deep linking** — Tab navigation without React Router means no bookmarkable URLs. Acceptable for mobile-first SPA.
+3. **Mock data coupling** — `pharmacies.find(p => p.name.includes(regimen.pharmacyName))` in `App.tsx` is string-fragile. Replace with ID-based lookup when DB persistence lands.
+4. **In-memory subscriptions** — Push subscriptions and OIDC sessions stored in `Map`; lost on server restart. Must migrate to persistent storage before horizontal scaling.
+5. **Background sync stubs** — `replayQueuedHoldLocks()` in `sw.js` is a no-op until the IndexedDB queue is implemented.
+6. **VAPID keys not generated** — `VAPID_PUBLIC_KEY` defaults to empty string; push subscription will silently no-op until keys are configured.
 
 ---
 
 ## Frequently Referenced Paths
 
-| Purpose            | Path                              |
-|---------------------|-----------------------------------|
-| App entry point     | `src/App.tsx`                     |
-| Type definitions    | `src/types.ts`                    |
-| Mock data           | `src/data/mockData.ts`            |
-| Component directory | `src/components/`                 |
-| Global styles       | `src/index.css`                   |
-| Vite config         | `vite.config.ts`                  |
-| Environment example | `.env.example`                    |
-| Package manifest    | `package.json`                    |
+| Purpose                  | Path                                        |
+|--------------------------|---------------------------------------------|
+| App entry point          | `src/App.tsx`                               |
+| App boot (global errors) | `src/main.tsx`                              |
+| Type definitions         | `src/types.ts`                              |
+| Mock data                | `src/data/mockData.ts`                      |
+| IndexedDB wrapper        | `src/lib/db.ts`                             |
+| Offline cache helpers    | `src/lib/offlineCache.ts`                   |
+| Error reporting          | `src/lib/errorReporting.ts`                 |
+| Push hook                | `src/hooks/usePushNotifications.ts`         |
+| Focus trap hook          | `src/hooks/useFocusTrap.ts`                 |
+| API hook                 | `src/hooks/useApi.ts`                       |
+| Component directory      | `src/components/`                           |
+| Install prompt           | `src/components/InstallPrompt.tsx`          |
+| Global styles            | `src/index.css`                             |
+| Service worker           | `public/sw.js`                              |
+| Vite config              | `vite.config.ts`                            |
+| Server entry             | `server.ts`                                 |
+| Server config            | `server/config.ts`                          |
+| Push route               | `server/routes/push.ts`                     |
+| Error route              | `server/routes/errors.ts`                   |
+| OIDC service             | `server/services/oidcService.ts`            |
+| CI pipeline              | `.github/workflows/ci.yml`                  |
+| Deploy workflow          | `.github/workflows/deploy.yml`              |
+| Launch checklist         | `docs/launch-checklist.md`                  |
+| Environment example      | `.env.example`                              |
 
 ---
 
-*Last updated: 2026-09-08*
+*Last updated: 2026-09-09*
