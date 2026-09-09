@@ -10,8 +10,9 @@
     "resolveJsonModule": true,
     "outDir": "./build",
     "rootDir": "./src",
-    "noEmit": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "build", "test"]
