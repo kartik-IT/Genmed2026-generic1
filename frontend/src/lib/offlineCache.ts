@@ -5,6 +5,8 @@
  * IndexedDB. Successful network responses are persisted to IndexedDB
  * so the next offline session has data to show.
  *
+ * If both network and cache fail, falls back to hardcoded mock data.
+ *
  * STALE_THRESHOLD_MS: data older than 10 minutes is treated as
  * potentially stale and a background network refresh is attempted,
  * but the cached data is returned immediately (stale-while-revalidate).
@@ -12,6 +14,7 @@
 
 import { putAll, getAll, cacheAgeMs } from './db';
 import { DrugProfile, Pharmacy, TrackedRegimen, FillLedgerItem } from '../types';
+import { MOCK_DRUGS, MOCK_PHARMACIES, MOCK_REGIMENS, MOCK_LEDGER } from '../data/mockData';
 
 const STALE_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
 
@@ -46,10 +49,13 @@ export async function getCachedDrugs(): Promise<DrugProfile[]> {
   try {
     return await fetchAndCache();
   } catch {
-    // Network unavailable — serve stale cache
+    // Network unavailable — try cache first
     const cached = await getAll<DrugProfile>('drugs');
     if (cached.length > 0) return cached;
-    throw new Error('Drug data is unavailable offline. Please connect to the internet and try again.');
+    
+    // No cache — use mock data as last resort
+    console.warn('[Offline Cache] Using mock drug data (backend unavailable)');
+    return MOCK_DRUGS;
   }
 }
 
@@ -77,7 +83,10 @@ export async function getCachedPharmacies(): Promise<Pharmacy[]> {
   } catch {
     const cached = await getAll<Pharmacy>('pharmacies');
     if (cached.length > 0) return cached;
-    throw new Error('Pharmacy data is unavailable offline.');
+    
+    // No cache — use mock data
+    console.warn('[Offline Cache] Using mock pharmacy data (backend unavailable)');
+    return MOCK_PHARMACIES;
   }
 }
 
@@ -105,7 +114,10 @@ export async function getCachedRegimens(): Promise<TrackedRegimen[]> {
   } catch {
     const cached = await getAll<TrackedRegimen>('regimens');
     if (cached.length > 0) return cached;
-    return [];
+    
+    // No cache — use mock data
+    console.warn('[Offline Cache] Using mock regimen data (backend unavailable)');
+    return MOCK_REGIMENS;
   }
 }
 
@@ -133,6 +145,9 @@ export async function getCachedLedger(): Promise<FillLedgerItem[]> {
   } catch {
     const cached = await getAll<FillLedgerItem>('ledger');
     if (cached.length > 0) return cached;
-    return [];
+    
+    // No cache — use mock data
+    console.warn('[Offline Cache] Using mock ledger data (backend unavailable)');
+    return MOCK_LEDGER;
   }
 }

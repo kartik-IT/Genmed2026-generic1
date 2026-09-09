@@ -4,6 +4,9 @@
 
 const BASE_URL = '';
 
+// Flag to track if backend is available
+let backendAvailable = true;
+
 // ── Error types ─────────────────────────────────────────────────────
 
 export class ApiError extends Error {
@@ -41,15 +44,28 @@ async function request<T>(
 
     if (!response.ok) {
       const body = await response.json().catch(() => null);
+      
+      // Mark backend as unavailable on 502/503/504 errors
+      if (response.status === 502 || response.status === 503 || response.status === 504) {
+        backendAvailable = false;
+        console.warn('[API Client] Backend unavailable, falling back to mock data');
+      }
+      
       throw new ApiError(response.status, response.statusText, body);
     }
 
+    // Backend is responsive
+    backendAvailable = true;
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) throw error;
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw new ApiError(408, 'Request timeout');
     }
+    
+    // Network error - backend likely unavailable
+    backendAvailable = false;
+    console.warn('[API Client] Network error, falling back to mock data');
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -67,4 +83,8 @@ export async function post<T>(endpoint: string, body: unknown): Promise<T> {
     method: 'POST',
     body: JSON.stringify(body),
   });
+}
+
+export function isBackendAvailable(): boolean {
+  return backendAvailable;
 }
