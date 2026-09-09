@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { DrugProfile, Pharmacy } from '../types';
+import { aiSearch } from '../api/ai';
 
 interface SearchScreenProps {
   drug: DrugProfile;
@@ -37,9 +38,15 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
   const [voiceSearchActive, setVoiceSearchActive] = useState(false);
   const [supplyDays, setSupplyDays] = useState<'30' | '90'>('30');
   const [selectedStrength, setSelectedStrength] = useState(drug.strength);
+<<<<<<< HEAD
   const [savingsTimeframe, setSavingsTimeframe] = useState<'month' | 'year' | '3years'>('year');
   const [isFamilyPlan, setIsFamilyPlan] = useState(false);
   const [isEquivalenceExpanded, setIsEquivalenceExpanded] = useState(false);
+=======
+  const [aiMatches, setAiMatches] = useState<DrugProfile[] | null>(null);
+  const [aiSummary, setAiSummary] = useState('');
+  const [isAiSearching, setIsAiSearching] = useState(false);
+>>>>>>> 5ce7349 (My project is completely pushed)
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +69,40 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Keep local filtering instant, then improve the results with the server-side
+  // natural-language matcher once the user pauses typing.
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setAiMatches(null);
+      setAiSummary('');
+      setIsAiSearching(false);
+      return;
+    }
+
+    let isCurrent = true;
+    const timer = window.setTimeout(async () => {
+      setIsAiSearching(true);
+      try {
+        const response = await aiSearch(query);
+        if (isCurrent) {
+          setAiMatches(response.drugs);
+          setAiSummary(response.aiSummary);
+        }
+      } catch {
+        // The local matcher remains available when the API is unavailable.
+        if (isCurrent) setAiMatches(null);
+      } finally {
+        if (isCurrent) setIsAiSearching(false);
+      }
+    }, 350);
+
+    return () => {
+      isCurrent = false;
+      window.clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
   const activePharmacies = pharmacies && pharmacies.length > 0 ? pharmacies : drug.pharmacies || [];
 
   const filters = [
@@ -76,7 +117,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
   const quickDrugs = allDrugs.slice(0, 6);
 
   // Autocomplete search filtering
-  const matchingDrugs = useMemo(() => {
+  const localMatchingDrugs = useMemo(() => {
     if (!searchQuery.trim()) {
       return allDrugs;
     }
@@ -95,6 +136,8 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
         (q.includes('thyroid') && d.genericName.toLowerCase().includes('levothyroxine'))
     );
   }, [searchQuery, allDrugs]);
+
+  const matchingDrugs = aiMatches ?? localMatchingDrugs;
 
   // Dosage options based on the drug
   const dosageOptions = useMemo(() => {
@@ -250,8 +293,13 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
             <div className="absolute top-full left-0 right-0 mt-1.5 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container z-40 max-h-72 overflow-y-auto no-scrollbar py-1 divide-y divide-surface-container/60">
               <div className="px-3 py-1.5 flex items-center justify-between text-[11px] font-semibold text-on-surface-variant bg-surface-container-low">
                 <span>{searchQuery ? `Matching medications (${matchingDrugs.length})` : 'Popular Generic Equivalents'}</span>
-                <span className="text-[10px] text-secondary font-bold">Tap to switch</span>
+                <span className="text-[10px] text-secondary font-bold">{isAiSearching ? 'Finding best match…' : 'Tap to switch'}</span>
               </div>
+              {aiSummary && (
+                <p className="px-3 py-2 text-[11px] text-on-surface-variant bg-secondary-container/15 border-b border-surface-container/60">
+                  {aiSummary}
+                </p>
+              )}
               {matchingDrugs.map((d) => {
                 const isSelected = d.id === drug.id;
                 return (

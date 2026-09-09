@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Pharmacy, DrugProfile } from '../types';
-import { ASSET_IMAGES } from '../data/mockData';
+import { ASSET_IMAGES } from '../data/assets';
 
 interface PharmaciesScreenProps {
   pharmacies: Pharmacy[];
@@ -79,7 +79,7 @@ export const PharmaciesScreen: React.FC<PharmaciesScreenProps> = ({
       if (activeFilter === 'Under $10') return p.cashPrice <= 10;
       if (activeFilter === 'Drive-Thru') return p.driveThru;
       if (activeFilter === '24 Hours') return p.hours.includes('24');
-      if (activeFilter === 'Same-Day Stock') return p.stockUnits > 0;
+      if (activeFilter === 'Same-Day Stock') return p.stockCount > 0;
       return true;
     });
   }, [pharmacies, searchQuery, activeFilter]);
@@ -426,7 +426,7 @@ export const PharmaciesScreen: React.FC<PharmaciesScreenProps> = ({
                       <span className="material-symbols-outlined text-[14px]">star</span> {pharm.rating} ({pharm.reviewCount} reviews)
                     </span>
                     <span>•</span>
-                    <span className="text-on-surface font-medium">Generic Bio-Match: {pharm.genericBioMatch}</span>
+                    <span className="text-on-surface font-medium">Generic Bio-Match: {pharm.bioMatchPercent}%</span>
                   </div>
                 </div>
                 <button

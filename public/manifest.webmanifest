@@ -1,0 +1,12 @@
+{
+  "name": "Low & Best Medicine Generics",
+  "short_name": "Low & Best",
+  "description": "Compare generic medicine options and local savings.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9ff",
+  "theme_color": "#006a61",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

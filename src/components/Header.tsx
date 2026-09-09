@@ -1,14 +1,19 @@
 import React from 'react';
-import { ASSET_IMAGES } from '../data/mockData';
+import { ASSET_IMAGES } from '../data/assets';
 
 interface HeaderProps {
   currentLocation: string;
   onOpenLocation: () => void;
   onOpenNotifications: () => void;
+<<<<<<< HEAD
   onOpenThemeModal: () => void;
   onToggleDarkMode: () => void;
   isDarkMode: boolean;
   currentThemeName?: string;
+=======
+  isAuthenticationAvailable?: boolean;
+  onSignIn?: () => void;
+>>>>>>> 5ce7349 (My project is completely pushed)
   unreadCount?: number;
 }
 
@@ -16,10 +21,15 @@ export const Header: React.FC<HeaderProps> = ({
   currentLocation,
   onOpenLocation,
   onOpenNotifications,
+<<<<<<< HEAD
   onOpenThemeModal,
   onToggleDarkMode,
   isDarkMode,
   currentThemeName = 'Clinical Teal',
+=======
+  isAuthenticationAvailable = false,
+  onSignIn,
+>>>>>>> 5ce7349 (My project is completely pushed)
   unreadCount = 2,
 }) => {
   return (
@@ -92,6 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface"></span>
             )}
           </button>
+<<<<<<< HEAD
 
           {/* User Profile */}
           <div
@@ -101,9 +112,22 @@ export const Header: React.FC<HeaderProps> = ({
             <img
               alt="Profile"
               className="w-7 h-7 rounded-full object-cover ring-1 ring-surface-container"
+=======
+          <button
+            type="button"
+            aria-label={isAuthenticationAvailable ? 'Sign in' : 'Authentication is not configured'}
+            disabled={!isAuthenticationAvailable}
+            onClick={onSignIn}
+            title={isAuthenticationAvailable ? 'Sign in' : 'Sign-in will be available when authentication is configured'}
+            className="w-10 h-10 flex items-center justify-center rounded-lg disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <img
+              alt=""
+              className="w-8 h-8 rounded-full object-cover ring-1 ring-surface-container"
+>>>>>>> 5ce7349 (My project is completely pushed)
               src={ASSET_IMAGES.profile}
             />
-          </div>
+          </button>
         </div>
       </div>
     </header>

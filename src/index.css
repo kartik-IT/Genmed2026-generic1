@@ -395,6 +395,20 @@
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
+
+  :focus-visible {
+    outline: 3px solid var(--color-secondary, #006a61);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .material-symbols-outlined {

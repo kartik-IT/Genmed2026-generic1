@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { NavTab, Pharmacy, TrackedRegimen, DrugProfile, GenericAlternative, ThemeMode } from './types';
 import {
@@ -12,6 +13,15 @@ import {
   MOCK_LEDGER,
 } from './data/mockData';
 import { THEME_OPTIONS } from './data/themeOptions';
+=======
+import React, { useState } from 'react';
+import { NavTab, Pharmacy, TrackedRegimen, DrugProfile, GenericAlternative } from './types';
+import { useApi } from './hooks/useApi';
+import { fetchAllDrugs } from './api/drugs';
+import { fetchPharmacies } from './api/pharmacies';
+import { fetchRegimens } from './api/regimens';
+import { fetchLedger } from './api/regimens';
+>>>>>>> 5ce7349 (My project is completely pushed)
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { SearchScreen } from './components/SearchScreen';
@@ -27,15 +37,28 @@ import { SavingsHistoryModal } from './components/SavingsHistoryModal';
 import { PillVisualizerModal } from './components/PillVisualizerModal';
 import { ThemeModal } from './components/ThemeModal';
 import { ToastContainer, ToastData } from './components/Toast';
+import { LoadingSkeleton } from './components/LoadingSkeleton';
+import { ErrorBoundary, ErrorFallback } from './components/ErrorBoundary';
+import { fetchAuthStatus } from './api/auth';
 
 export default function App() {
+  // ── API data fetching ───────────────────────────────────────────
+  const { data: allDrugs, loading: drugsLoading, error: drugsError, refetch: refetchDrugs } = useApi(fetchAllDrugs);
+  const { data: allPharmacies, loading: pharmaciesLoading, error: pharmaciesError } = useApi(fetchPharmacies);
+  const { data: allRegimens, loading: regimensLoading } = useApi(fetchRegimens);
+  const { data: allLedger, loading: ledgerLoading } = useApi(fetchLedger);
+  const { data: authStatus } = useApi(fetchAuthStatus);
+
+  const isInitialLoading = drugsLoading || pharmaciesLoading;
+
   const [currentTab, setCurrentTab] = useState<NavTab>('search');
   const [currentLocation, setCurrentLocation] = useState('Austin, TX (3.2 mi)');
-  const [activeDrug, setActiveDrug] = useState<DrugProfile>(MOCK_DRUGS[0]);
-  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy>(MOCK_PHARMACIES[0]);
+  const [activeDrug, setActiveDrug] = useState<DrugProfile | null>(null);
+  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
   const [selectedRegimen, setSelectedRegimen] = useState<TrackedRegimen | null>(null);
   const [selectedAlternativeForPill, setSelectedAlternativeForPill] = useState<GenericAlternative | undefined>(undefined);
 
+<<<<<<< HEAD
   // Theme state with localStorage persistence
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>(() => {
     try {
@@ -78,6 +101,20 @@ export default function App() {
       showToast('Switched to Midnight Slate Dark theme', 'info', 'dark_mode');
     }
   };
+=======
+  // Set initial selections once data arrives
+  React.useEffect(() => {
+    if (allDrugs && allDrugs.length > 0 && !activeDrug) {
+      setActiveDrug(allDrugs[0]);
+    }
+  }, [allDrugs, activeDrug]);
+
+  React.useEffect(() => {
+    if (allPharmacies && allPharmacies.length > 0 && !selectedPharmacy) {
+      setSelectedPharmacy(allPharmacies[0]);
+    }
+  }, [allPharmacies, selectedPharmacy]);
+>>>>>>> 5ce7349 (My project is completely pushed)
 
   // Modals state
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
@@ -118,7 +155,8 @@ export default function App() {
 
   // Barcode scan outcome handler
   const handleScanSuccess = (scannedDrugName: string) => {
-    const matched = MOCK_DRUGS.find((d) =>
+    const drugs = allDrugs || [];
+    const matched = drugs.find((d) =>
       d.genericName.toLowerCase().includes(scannedDrugName.toLowerCase()) ||
       scannedDrugName.toLowerCase().includes(d.genericName.toLowerCase())
     );
@@ -154,7 +192,34 @@ export default function App() {
     setIsPillModalOpen(true);
   };
 
+  // ── Derived data ────────────────────────────────────────────────
+  const drugs = allDrugs || [];
+  const pharmacies = allPharmacies || [];
+  const regimens = allRegimens || [];
+  const ledger = allLedger || [];
+
+  // ── Loading state ───────────────────────────────────────────────
+  if (isInitialLoading) {
+    return <LoadingSkeleton />;
+  }
+
+  // ── Error state ─────────────────────────────────────────────────
+  if (drugsError || pharmaciesError) {
+    return (
+      <ErrorFallback
+        error={drugsError || pharmaciesError}
+        onRetry={refetchDrugs}
+      />
+    );
+  }
+
+  // ── Guard: wait for initial data ────────────────────────────────
+  if (!activeDrug || !selectedPharmacy) {
+    return <LoadingSkeleton />;
+  }
+
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-surface font-sans text-on-surface selection:bg-secondary/20 selection:text-secondary">
       {/* Toast Alert Engine */}
       <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />
@@ -164,11 +229,16 @@ export default function App() {
         currentLocation={currentLocation}
         onOpenLocation={() => setIsLocationModalOpen(true)}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
+<<<<<<< HEAD
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
         onToggleDarkMode={handleToggleDarkMode}
         isDarkMode={isDarkMode}
         currentThemeName={activeThemeObj.name}
         unreadCount={2}
+=======
+        isAuthenticationAvailable={authStatus?.configured || false}
+        onSignIn={() => window.location.assign('/api/auth/login')}
+>>>>>>> 5ce7349 (My project is completely pushed)
       />
 
       {/* Main Screens Container */}
@@ -176,12 +246,13 @@ export default function App() {
         {currentTab === 'search' && (
           <SearchScreen
             drug={activeDrug}
-            allDrugs={MOCK_DRUGS}
+            allDrugs={drugs}
             onSelectDrug={handleSelectDrug}
             onNavigateToCompare={() => setCurrentTab('compare')}
+            onOpenBarcodeScanner={() => setIsBarcodeScannerOpen(true)}
             onNavigateToPharmacies={(pharmacyId) => {
               if (pharmacyId) {
-                const found = MOCK_PHARMACIES.find((p) => p.id === pharmacyId);
+                const found = pharmacies.find((p) => p.id === pharmacyId);
                 if (found) setSelectedPharmacy(found);
               }
               setCurrentTab('pharmacies');
@@ -198,20 +269,23 @@ export default function App() {
             drug={activeDrug}
             onNavigateToPharmacies={(pharmacyId) => {
               if (pharmacyId) {
-                const found = MOCK_PHARMACIES.find((p) => p.id === pharmacyId);
+                const found = pharmacies.find((p) => p.id === pharmacyId);
                 if (found) setSelectedPharmacy(found);
               }
               setCurrentTab('pharmacies');
             }}
-            onOpenHoldLock={() => handleHoldLockPharmacy(MOCK_PHARMACIES[0])}
-            onOpenPillVisualizer={handleOpenPillModal}
+            onOpenHoldLock={() => handleHoldLockPharmacy(pharmacies[0])}
+            onOpenPillVisualizer={(selectedDrug, alternative) => {
+              setActiveDrug(selectedDrug);
+              handleOpenPillModal(alternative);
+            }}
             onShowToast={showToast}
           />
         )}
 
         {currentTab === 'pharmacies' && (
           <PharmaciesScreen
-            pharmacies={MOCK_PHARMACIES}
+            pharmacies={pharmacies}
             currentLocation={currentLocation}
             drug={activeDrug}
             onOpenLocation={() => setIsLocationModalOpen(true)}
@@ -225,13 +299,13 @@ export default function App() {
 
         {currentTab === 'saved-rx' && (
           <SavedRxScreen
-            regimens={MOCK_REGIMENS}
-            ledgerItems={MOCK_LEDGER}
+            regimens={regimens}
+            ledgerItems={ledger}
             onOpenBarcodeScanner={() => setIsBarcodeScannerOpen(true)}
             onReserveRegimen={(regimen) => {
               const matchedPharm =
-                MOCK_PHARMACIES.find((p) => p.name.includes(regimen.pharmacyName)) ||
-                MOCK_PHARMACIES[0];
+                pharmacies.find((p) => p.name.includes(regimen.pharmacyName)) ||
+                pharmacies[0];
               handleHoldLockPharmacy(matchedPharm);
             }}
             onOpenSavingsHistory={handleOpenSavingsHistory}
@@ -245,7 +319,6 @@ export default function App() {
       <BottomNav
         activeTab={currentTab}
         onTabChange={(tab) => setCurrentTab(tab)}
-        savedCount={MOCK_REGIMENS.length}
       />
 
       {/* Interactive Modals */}
@@ -327,5 +400,6 @@ export default function App() {
         onShowToast={showToast}
       />
     </div>
+    </ErrorBoundary>
   );
 }

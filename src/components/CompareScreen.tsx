@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { DrugProfile, GenericAlternative } from '../types';
-import { PRESCRIBER_QUESTIONS } from '../data/mockData';
+import { PRESCRIBER_QUESTIONS } from '../data/assets';
+import { aiRecommend } from '../api/ai';
 
 interface CompareScreenProps {
   drug: DrugProfile;
@@ -21,6 +22,8 @@ export const CompareScreen: React.FC<CompareScreenProps> = ({
   const [paymentType, setPaymentType] = useState<'cash' | 'copay'>('cash');
   const [copayTier, setCopayTier] = useState<number>(25);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [recommendation, setRecommendation] = useState<string | null>(null);
+  const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
 
   // Active generic selection
   const topAlternative = useMemo(() => {
@@ -93,6 +96,18 @@ export const CompareScreen: React.FC<CompareScreenProps> = ({
         'info',
         next ? 'bookmark_added' : 'bookmark_remove'
       );
+    }
+  };
+
+  const handleSavingsRecommendation = async () => {
+    setIsRecommendationLoading(true);
+    try {
+      const response = await aiRecommend(drug.id);
+      setRecommendation(response.recommendation);
+    } catch {
+      if (onShowToast) onShowToast('Savings guidance is unavailable. Please try again.', 'warning', 'cloud_off');
+    } finally {
+      setIsRecommendationLoading(false);
     }
   };
 
@@ -176,6 +191,26 @@ export const CompareScreen: React.FC<CompareScreenProps> = ({
               Price Breakdown
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="px-3 pb-2">
+        <div className="rounded-xl border border-secondary/25 bg-secondary-container/20 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-on-surface">Personalized savings guidance</h2>
+              <p className="mt-0.5 text-xs text-on-surface-variant">Uses the secure server-side assistant; no API key is sent to your device.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSavingsRecommendation}
+              disabled={isRecommendationLoading}
+              className="shrink-0 rounded-lg bg-secondary px-3 py-2 text-xs font-bold text-on-secondary disabled:cursor-wait disabled:opacity-60"
+            >
+              {isRecommendationLoading ? 'Thinking…' : 'Get advice'}
+            </button>
+          </div>
+          {recommendation && <p className="mt-3 border-t border-secondary/15 pt-3 text-xs leading-relaxed text-on-surface">{recommendation}</p>}
         </div>
       </section>
 
