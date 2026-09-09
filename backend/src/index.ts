@@ -1,20 +1,20 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { config } from './config';
-import { rateLimiter } from './middleware/rateLimiter';
-import { cacheMiddleware } from './middleware/cache';
-import { marketProviderStatus } from './services/marketDataService';
+import { config } from './config.js';
+import { rateLimiter } from './middleware/rateLimiter.js';
+import { cacheMiddleware } from './middleware/cache.js';
+import { marketProviderStatus } from './services/marketDataService.js';
 
 // Route imports
-import drugsRouter from './routes/drugs';
-import pharmaciesRouter from './routes/pharmacies';
-import regimensRouter from './routes/regimens';
-import pricingRouter from './routes/pricing';
-import aiRouter from './routes/ai';
-import authRouter from './routes/auth';
-import pushRouter from './routes/push';
-import errorsRouter from './routes/errors';
+import drugsRouter from './routes/drugs.js';
+import pharmaciesRouter from './routes/pharmacies.js';
+import regimensRouter from './routes/regimens.js';
+import pricingRouter from './routes/pricing.js';
+import aiRouter from './routes/ai.js';
+import authRouter from './routes/auth.js';
+import pushRouter from './routes/push.js';
+import errorsRouter from './routes/errors.js';
 
 const app = express();
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));

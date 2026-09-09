@@ -3,8 +3,8 @@ import {
   getAllPharmacies,
   getPharmacyById,
   getPharmaciesForDrug,
-} from '../services/dataService';
-import { verifyStock } from '../services/marketDataService';
+} from '../services/dataService.js';
+import { verifyStock } from '../services/marketDataService.js';
 
 const router = Router();
 

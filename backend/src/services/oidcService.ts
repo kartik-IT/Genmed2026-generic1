@@ -1,5 +1,5 @@
 import { createHash, randomBytes, createPublicKey, verify, type JsonWebKey as NodeJsonWebKey } from 'crypto';
-import { config } from '../config';
+import { config } from '../config.js';
 
 export interface AuthUser {
   id: string;

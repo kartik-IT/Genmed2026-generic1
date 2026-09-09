@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getAllRegimens, getRegimenById, getLedger } from '../services/dataService';
+import { getAllRegimens, getRegimenById, getLedger } from '../services/dataService.js';
 
 const router = Router();
 

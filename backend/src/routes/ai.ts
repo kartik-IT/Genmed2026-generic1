@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { aiSearchDrugs, aiRecommend, aiCompareSummary } from '../services/geminiService';
-import { isGeminiConfigured } from '../config';
+import { aiSearchDrugs, aiRecommend, aiCompareSummary } from '../services/geminiService.js';
+import { isGeminiConfigured } from '../config.js';
 
 const router = Router();
 

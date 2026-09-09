@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { getDrugById } from '../services/dataService';
-import { fetchPartnerPrices, MarketDataSource, MarketPrice } from '../services/marketDataService';
+import { getDrugById } from '../services/dataService.js';
+import { fetchPartnerPrices, MarketDataSource, MarketPrice } from '../services/marketDataService.js';
 
 const router = Router();
 

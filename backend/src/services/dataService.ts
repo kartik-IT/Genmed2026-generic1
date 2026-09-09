@@ -1,4 +1,4 @@
-import { DrugProfile, Pharmacy, TrackedRegimen, FillLedgerItem } from '../types';
+import { DrugProfile, Pharmacy, TrackedRegimen, FillLedgerItem } from '../types.js';
 
 // ── In-memory data store ────────────────────────────────────────────
 // Seeded from the existing mock data. When a real database is added,
@@ -9,7 +9,7 @@ import {
   MOCK_PHARMACIES,
   MOCK_REGIMENS,
   MOCK_LEDGER,
-} from '../data/mockData';
+} from '../data/mockData.js';
 
 // ── Drug queries ────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
-import { Pharmacy } from '../types';
-import { config } from '../config';
+import { Pharmacy } from '../types.js';
+import { config } from '../config.js';
 
 export type MarketDataSource = 'partner' | 'seeded';
 

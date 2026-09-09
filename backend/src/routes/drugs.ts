@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { getAllDrugs, getDrugById, searchDrugs } from '../services/dataService';
-import { lookupNdc } from '../services/openFdaService';
-import { config } from '../config';
+import { getAllDrugs, getDrugById, searchDrugs } from '../services/dataService.js';
+import { lookupNdc } from '../services/openFdaService.js';
+import { config } from '../config.js';
 
 const router = Router();
 

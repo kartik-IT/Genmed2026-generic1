@@ -1,4 +1,4 @@
-import { DrugProfile, Pharmacy, TrackedRegimen, FillLedgerItem } from '../types';
+import { DrugProfile, Pharmacy, TrackedRegimen, FillLedgerItem } from '../types.js';
 
 export const ASSET_IMAGES = {
   logo: 'https://lh3.googleusercontent.com/aida/AEtjO1XNHuOK0IDXVtTq8B5nIu1wXxQvLOJaxkulYlQTbfw_Esj4-21JZOHDdQ5rPQiP2TQSKZEaMoI3k-DV9iXufa2CNqwTAPZHSf_t06pen_8ftAP6tXcIcnxW09-dJJ-DFQPH5-qlS9lX77EF97p3n2vSfe9uEyQVlu1tN3rLu9waJ8apNI83F-8fZnrsqq-CDZ1CuhVBE3jo-lTKrfCpw8aDE_-A2gefC3wVGDvBfLIuD9xJQgIG2Zcp7g',

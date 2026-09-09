@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
-import { config, isGeminiConfigured } from '../config';
-import { getAllDrugs, getDrugById } from './dataService';
-import { DrugProfile } from '../types';
+import { config, isGeminiConfigured } from '../config.js';
+import { getAllDrugs, getDrugById } from './dataService.js';
+import { DrugProfile } from '../types.js';
 
 // ── Gemini client initialization ────────────────────────────────────
 

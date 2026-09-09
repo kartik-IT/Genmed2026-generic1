@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { beginLogin, completeLogin, getSession, isOidcConfigured, revokeSession } from '../services/oidcService';
-import { config } from '../config';
+import { beginLogin, completeLogin, getSession, isOidcConfigured, revokeSession } from '../services/oidcService.js';
+import { config } from '../config.js';
 
 const router = Router();
 const cookieName = 'genmed_session';
