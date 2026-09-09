@@ -120,18 +120,6 @@ app.use((error: unknown, req: express.Request, res: express.Response, _next: exp
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// ── Static file serving (production) ────────────────────────────────
-
-if (!config.isDev) {
-  const distPath = path.resolve(currentDirectory, 'dist');
-  app.use(express.static(distPath));
-
-  // SPA fallback — serve index.html for non-API routes
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-}
-
 // ── Start server ────────────────────────────────────────────────────
 
 app.listen(config.port, () => {
